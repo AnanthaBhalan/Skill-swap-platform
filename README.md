@@ -1,70 +1,92 @@
-# Getting Started with Create React App
+# Skill Swap Platform
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Live Demo
+You can view the live application here: [https://odoo-57c97.web.app/](https://odoo-57c97.web.app/)
 
-## Available Scripts
+## Project Description
+A web application built with React, Firebase (Authentication, Firestore), and Tailwind CSS that allows users to create profiles, list skills they can offer, and skills they want to learn. Users can browse other public profiles to find potential skill-swapping partners.
 
-In the project directory, you can run:
+## Features
+* User Profile Creation (Name, Location, Profile Photo URL)
+* **Skills Offered:** Users can list skills they are proficient in.
+* **Skills Wanted:** Users can list skills they wish to learn.
+* Public Profile Visibility Toggle.
+* Browse Public User Profiles: View other users' names, locations, and listed skills.
+* Responsive UI with a colorful design using Tailwind CSS.
+* Anonymous Authentication for easy onboarding.
+* Data persistence using Firebase Firestore.
 
-### `npm start`
+## Technologies Used
+* **Frontend:** React.js
+* **Styling:** Tailwind CSS
+* **Backend/Database/Auth:** Google Firebase (Firestore, Authentication, Hosting)
+* **Package Manager:** npm
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Setup and Local Development
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+To run this project locally, follow these steps:
 
-### `npm test`
+1.  **Clone the repository:**
+    ```bash
+    git clone [https://github.com/AnanthaBhalan/Skill-swap-platform.git](https://github.com/AnanthaBhalan/Skill-swap-platform.git)
+    cd Skill-swap-platform
+    ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
 
-### `npm run build`
+3.  **Firebase Project Setup:**
+    * Go to [Firebase Console](https://console.firebase.google.com/) and create a new project.
+    * **Enable Firestore Database:** In the Firebase Console, navigate to `Build` > `Firestore Database` and click "Create database". Choose "Start in test mode" for quick setup.
+    * **Update Firestore Security Rules:** Go to `Build` > `Firestore Database` > `Rules` tab and replace the rules with:
+        ```firestore
+        rules_version = '2';
+        service cloud.firestore {
+          match /databases/{database}/documents {
+            match /artifacts/{appId}/public/data/users/{userId} {
+              allow read: if request.auth != null;
+              allow write: if request.auth != null && request.auth.uid == userId;
+            }
+          }
+        }
+        ```
+        Click "Publish".
+    * **Enable Anonymous Authentication:** Go to `Build` > `Authentication` > `Sign-in method` tab. Find "Anonymous", click the pencil icon, enable it, and click "Save".
+    * **Get Firebase Configuration:** Go to `Project settings` (gear icon) > `Your apps` section. If you haven't added a web app, click `</>` to add one. Copy the `firebaseConfig` object provided.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4.  **Update `src/App.js` with your Firebase Config:**
+    * Open `src/App.js`.
+    * Find the `const firebaseConfig = { ... };` block.
+    * **Replace the placeholder values** with your actual `apiKey`, `authDomain`, `projectId`, etc., that you copied from the Firebase Console.
+        ```javascript
+        const firebaseConfig = {
+          apiKey: "YOUR_API_KEY_HERE",
+          authDomain: "YOUR_AUTH_DOMAIN_HERE",
+          projectId: "YOUR_PROJECT_ID_HERE",
+          storageBucket: "YOUR_STORAGE_BUCKET_HERE",
+          messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
+          appId: "YOUR_APP_ID_HERE",
+          // measurementId: "YOUR_MEASUREMENT_ID_HERE" // Include if present
+        };
+        ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+5.  **Run the application locally:**
+    ```bash
+    npm start
+    ```
+    The app will open in your browser, usually at `http://localhost:3000`.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Deployment (Optional)
+To deploy updates to the live site:
+1.  Ensure you have Firebase CLI installed: `npm install -g firebase-tools`
+2.  Log in: `firebase login`
+3.  Build for production: `npm run build`
+4.  Deploy: `firebase deploy --only hosting`
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Future Enhancements
+* Implement robust search and filtering for skills.
+* Develop a "Swap Request" system with status tracking.
+* User profiles with more detailed information and skill endorsements.
+* Real-time notifications for swap requests.
