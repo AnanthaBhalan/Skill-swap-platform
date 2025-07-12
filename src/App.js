@@ -102,6 +102,9 @@ const App = () => {
   const [profileLocation, setProfileLocation] = useState('');
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
   const [isProfilePublic, setIsProfilePublic] = useState(true);
+  // NEW: State for skills
+  const [skillsOffered, setSkillsOffered] = useState('');
+  const [skillsWanted, setSkillsWanted] = useState('');
 
   // Initialize Firebase and Auth
   useEffect(() => {
@@ -109,7 +112,7 @@ const App = () => {
     try {
       const firebaseApp = initializeApp(firebaseConfig);
       const firestoreDb = getFirestore(firebaseApp);
-      const firebaseAuth = getAuth(firebaseApp); // Use firebaseAuth directly
+      const firebaseAuth = getAuth(firebaseApp);
 
       setDb(firestoreDb);
       setAuth(firebaseAuth);
@@ -168,6 +171,9 @@ const App = () => {
           setProfileLocation(data.location || '');
           setProfilePhotoUrl(data.profilePhotoUrl || '');
           setIsProfilePublic(data.isPublic !== undefined ? data.isPublic : true);
+          // NEW: Populate skills fields
+          setSkillsOffered(data.skillsOffered || '');
+          setSkillsWanted(data.skillsWanted || '');
         } else {
           setUserProfile(null);
           // Clear form fields if no profile
@@ -175,6 +181,9 @@ const App = () => {
           setProfileLocation('');
           setProfilePhotoUrl('');
           setIsProfilePublic(true);
+          // NEW: Clear skills fields
+          setSkillsOffered('');
+          setSkillsWanted('');
         }
       }, (error) => {
         console.error("Error fetching user profile:", error);
@@ -229,7 +238,9 @@ const App = () => {
       location: profileLocation,
       profilePhotoUrl: profilePhotoUrl,
       isPublic: isProfilePublic,
-      // Add more fields here as you expand the profile (skills offered/wanted, availability)
+      // NEW: Include skills in profile data
+      skillsOffered: skillsOffered,
+      skillsWanted: skillsWanted,
     };
 
     try {
@@ -351,6 +362,33 @@ const App = () => {
                     <img src={profilePhotoUrl} alt="Profile Preview" className="mt-4 w-32 h-32 rounded-full object-cover border-4 border-blue-300 shadow-md" onError={(e) => e.target.src = 'https://placehold.co/128x128/CCCCCC/FFFFFF?text=No+Image'} />
                   )}
                 </div>
+
+                {/* NEW: Skills Offered Input */}
+                <div className="form-group">
+                  <label htmlFor="skillsOffered" className="block text-gray-700 text-lg font-semibold mb-2">Skills I Can Offer (comma-separated):</label>
+                  <textarea
+                    id="skillsOffered"
+                    className="shadow-sm appearance-none border border-blue-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    value={skillsOffered}
+                    onChange={(e) => setSkillsOffered(e.target.value)}
+                    rows="3"
+                    placeholder="e.g., Web Development, Graphic Design, Spanish Tutoring"
+                  ></textarea>
+                </div>
+
+                {/* NEW: Skills Wanted Input */}
+                <div className="form-group">
+                  <label htmlFor="skillsWanted" className="block text-gray-700 text-lg font-semibold mb-2">Skills I Want to Learn (comma-separated):</label>
+                  <textarea
+                    id="skillsWanted"
+                    className="shadow-sm appearance-none border border-blue-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                    value={skillsWanted}
+                    onChange={(e) => setSkillsWanted(e.target.value)}
+                    rows="3"
+                    placeholder="e.g., Photography, Public Speaking, Data Science Basics"
+                  ></textarea>
+                </div>
+
                 <div className="form-group flex items-center">
                   <input
                     type="checkbox"
@@ -381,11 +419,15 @@ const App = () => {
                     <div>
                       <p className="text-xl font-semibold text-gray-800 mb-1"><strong>Name:</strong> {userProfile.name || 'Not set'}</p>
                       <p className="text-lg text-gray-700 mb-1"><strong>Location:</strong> {userProfile.location || 'Not set'}</p>
-                      <p className="text-lg text-gray-700"><strong>Public:</strong> {userProfile.isPublic ? 'Yes' : 'No'}</p>
+                      <p className="text-lg text-gray-700 mb-1"><strong>Public:</strong> {userProfile.isPublic ? 'Yes' : 'No'}</p>
+                      {/* NEW: Display Skills Offered */}
+                      <p className="text-lg text-gray-700 mb-1"><strong>Skills Offered:</strong> {userProfile.skillsOffered || 'None listed'}</p>
+                      {/* NEW: Display Skills Wanted */}
+                      <p className="text-lg text-gray-700"><strong>Skills Wanted:</strong> {userProfile.skillsWanted || 'None listed'}</p>
                     </div>
                   </div>
                   <p className="text-sm text-gray-500 mt-4">
-                    (Other profile details like skills offered/wanted will appear here as you add them.)
+                    (Other profile details will appear here as you add them.)
                   </p>
                 </div>
               )}
@@ -395,6 +437,16 @@ const App = () => {
           {activePage === 'browse-users' && (
             <div>
               <h2 className="text-4xl font-bold mb-6 text-blue-800 drop-shadow-sm">Browse Other Users</h2>
+              {/* NEW: Search/Filter Bar (Placeholder) */}
+              <div className="mb-6">
+                <input
+                  type="text"
+                  placeholder="Search skills (e.g., 'Web Development')"
+                  className="shadow-sm appearance-none border border-gray-300 rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
+                  // You'll add state and filtering logic here later
+                />
+              </div>
+
               {allUsers.length === 0 ? (
                 <p className="text-lg text-gray-600">No public profiles found. Create your own profile and make it public to be seen here!</p>
               ) : (
@@ -409,8 +461,21 @@ const App = () => {
                       <div>
                         <h3 className="text-xl font-bold text-purple-700 mt-2">{user.name || 'Anonymous User'}</h3>
                         <p className="text-gray-600 text-sm">{user.location || 'Location not set'}</p>
+                        {/* NEW: Display Skills Offered on Browse Cards */}
+                        {user.skillsOffered && <p className="text-sm text-gray-700 mt-1"><strong>Offers:</strong> {user.skillsOffered}</p>}
+                        {/* NEW: Display Skills Wanted on Browse Cards */}
+                        {user.skillsWanted && <p className="text-sm text-gray-700"><strong>Wants:</strong> {user.skillsWanted}</p>}
                         <p className="text-xs text-gray-500 mt-1 bg-purple-50 px-2 py-1 rounded-full inline-block">ID: {user.id.substring(0, 8)}...</p> {/* Shorten ID for display */}
-                        {/* Skills offered/wanted will be displayed here later */}
+
+                        {/* NEW: Swap Request Button (Placeholder) */}
+                        {user.id !== userId && ( // Don't show button on own profile
+                          <button
+                            className="mt-4 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-bold py-2 px-4 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
+                            onClick={() => alert(`Initiate swap with ${user.name || 'this user'} for skills: ${user.skillsOffered || 'N/A'} in exchange for ${user.skillsWanted || 'N/A'}`)} // Placeholder action
+                          >
+                            Request Swap
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))}
